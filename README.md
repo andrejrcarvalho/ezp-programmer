@@ -42,17 +42,38 @@ uv run ezp-programmer
 uv creates the virtualenv and installs PySide6, pyusb, and libusb-package (which bundles
 `libusb-1.0.dll`) on the first run.
 
-**Or download the Windows exe** (no Python needed). Every push builds `ezp-programmer.exe` in
-[GitHub Actions](https://github.com/andrejrcarvalho/ezp-programmer/actions): open a run and
-download the `ezp-programmer-windows` artifact. Tagged versions (`v*`) also attach the exe to the
-[Releases](https://github.com/andrejrcarvalho/ezp-programmer/releases) page. You still need the
+**Or download the Windows exe** (no Python needed) from the
+[Releases](https://github.com/andrejrcarvalho/ezp-programmer/releases) page. Builds of every
+push are also available as the `EZP-Programmer-windows-x64` artifact on each
+[Actions](https://github.com/andrejrcarvalho/ezp-programmer/actions) run. You still need the
 WinUSB driver from step 1.
 
-To build the exe yourself:
+To build the exe yourself (output: `dist\EZP-Programmer-<version>-windows-x64.exe`):
 
 ```bash
-uv run --with pyinstaller pyinstaller --noconfirm --onefile --windowed --name ezp-programmer --icon packaging/icon.ico --collect-data ezp_programmer --collect-all libusb_package --paths src src/ezp_programmer/__main__.py
+powershell -ExecutionPolicy Bypass -File packaging\build_windows.ps1
 ```
+
+## Releases
+
+CI ([`.github/workflows/build.yml`](.github/workflows/build.yml)) runs three jobs:
+
+1. **test**: all unit and GUI tests, plus `ezp-programmer --self-check`
+2. **windows** (after test): builds the exe, self-checks the built exe, and uploads it as an artifact
+3. **release** (only for `v*` tags, after windows): publishes a GitHub release with the exe
+
+To publish a version, bump `__version__` in `src/ezp_programmer/__init__.py`, commit, then:
+
+```bash
+git tag v0.1.0
+```
+```bash
+git push origin v0.1.0
+```
+
+The app icon is drawn by `packaging/make_icon.py`. After changing it, regenerate
+`src/ezp_programmer/assets/ezp-programmer.png` / `.ico` with
+`uv run --group build python packaging/make_icon.py`.
 
 ## Typical workflow
 
@@ -116,7 +137,7 @@ and a sample router firmware image.
 ## Development
 
 ```bash
-uv run pytest
+uv run pytest   # unit tests + GUI tests (offscreen, against the simulator)
 ```
 
 Code layout (`src/ezp_programmer/`):

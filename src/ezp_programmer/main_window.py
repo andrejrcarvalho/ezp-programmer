@@ -74,7 +74,11 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle(f"EZP Programmer {__version__}")
         self.resize(1200, 780)
-        self.settings = QSettings("ezp-programmer", "ezp-programmer")
+        # Honour QSettings.setDefaultFormat/setPath so tests can sandbox settings
+        # (the plain (org, app) constructor always uses the registry on Windows).
+        self.settings = QSettings(
+            QSettings.defaultFormat(), QSettings.Scope.UserScope, "ezp-programmer", "ezp-programmer"
+        )
         self.programmer: Programmer | None = None
         self.worker: Worker | None = None
         self.file_path: Path | None = None

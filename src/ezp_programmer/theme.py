@@ -222,4 +222,13 @@ def mono_font():
 
 
 def app_icon() -> QIcon:
-    return icon("chip", colors.accent, 64)
+    """Window / taskbar icon, rendered by packaging/make_icon.py."""
+    from importlib import resources
+
+    assets = resources.files("ezp_programmer.assets")
+    result = QIcon()
+    for name in ("ezp-programmer.ico", "ezp-programmer.png"):
+        path = assets.joinpath(name)
+        if path.is_file():
+            result.addFile(str(path))
+    return result

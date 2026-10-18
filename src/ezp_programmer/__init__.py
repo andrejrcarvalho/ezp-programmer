@@ -5,13 +5,19 @@ __version__ = "0.1.0"
 
 def self_check() -> int:
     """Verify bundled data and the libusb backend load (used by CI on the built exe)."""
+    from importlib import resources
+
     from .chips import load_chips
     from .transport import _backend
 
     chips = load_chips()
     backend = _backend()
-    ok = len(chips) > 700 and backend is not None
-    print(f"ezp-programmer {__version__}: {len(chips)} chips, libusb backend {'OK' if backend else 'MISSING'}")
+    icon = resources.files("ezp_programmer.assets").joinpath("ezp-programmer.png").is_file()
+    ok = len(chips) > 700 and backend is not None and icon
+    print(
+        f"ezp-programmer {__version__}: {len(chips)} chips, "
+        f"libusb backend {'OK' if backend else 'MISSING'}, icon {'OK' if icon else 'MISSING'}"
+    )
     return 0 if ok else 1
 
 
