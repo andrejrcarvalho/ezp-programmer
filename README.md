@@ -3,6 +3,8 @@
 A Qt (PySide6) desktop app for the **EZP2010 / EZP2012 / EZP2013** USB SPI flash and EEPROM
 programmers (USB ID `10C4:F5A0`). It is managed with [uv](https://docs.astral.sh/uv/).
 
+![EZP Programmer main window: chip list, hex view and activity log](docs/images/main.png)
+
 Features:
 
 - Connect, then show the firmware version and serial number
@@ -39,6 +41,18 @@ uv run ezp-programmer
 
 uv creates the virtualenv and installs PySide6, pyusb, and libusb-package (which bundles
 `libusb-1.0.dll`) on the first run.
+
+**Or download the Windows exe** (no Python needed). Every push builds `ezp-programmer.exe` in
+[GitHub Actions](https://github.com/andrejrcarvalho/ezp-programmer/actions): open a run and
+download the `ezp-programmer-windows` artifact. Tagged versions (`v*`) also attach the exe to the
+[Releases](https://github.com/andrejrcarvalho/ezp-programmer/releases) page. You still need the
+WinUSB driver from step 1.
+
+To build the exe yourself:
+
+```bash
+uv run --with pyinstaller pyinstaller --noconfirm --onefile --windowed --name ezp-programmer --icon packaging/icon.ico --collect-data ezp_programmer --collect-all libusb_package --paths src src/ezp_programmer/__main__.py
+```
 
 ## Typical workflow
 
@@ -80,6 +94,8 @@ Notes:
 Offsets are hex by default (`1000` = 0x1000). Use `#4096` for decimal, or `64K` / `1M`. You can also
 open files by dragging them onto the window, or from File → Open recent.
 
+![Differences tab listing changed ranges, with the changed bytes in red in the hex view](docs/images/differences.png)
+
 ## Analysis tab
 
 After every read or file load, the app scans the image and shows:
@@ -91,6 +107,11 @@ After every read or file load, the app scans the image and shows:
   volumes, U-Boot images and version strings, device trees, SquashFS / CramFS / JFFS2 / UBI, TRX,
   Android boot images, ELF, gzip / xz, and Linux kernel version strings. Double-click a row to select
   that range in the hex view.
+
+![Analysis tab in dark mode: usage map, detected U-Boot / kernel / SquashFS, and the find bar](docs/images/analysis-dark.png)
+
+The app follows the Windows light or dark mode setting. The screenshots use the built-in simulator
+and a sample router firmware image.
 
 ## Development
 
